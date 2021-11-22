@@ -1,1 +1,0 @@
-C:\Users\Administrator\source\repos\kmdfHelloWorld\x64\Debug\kmdfHelloWorld.sys

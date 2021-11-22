@@ -1,0 +1,3 @@
+﻿  main.c
+C:\Users\Administrator\source\repos\MyDriverR3\main.c(8,42): warning C4133: “函数”: 从“char [18]”到“LPCWSTR”的类型不兼容
+  MyDriverR3.vcxproj -> C:\Users\Administrator\source\repos\MyDriverR3\Debug\MyDriverR3.exe

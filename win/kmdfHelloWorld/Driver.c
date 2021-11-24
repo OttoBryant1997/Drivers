@@ -3,6 +3,9 @@
 #define DEVICE_NAME L"\\Device\\MyFirstDevice"
 #define SYM_NAME L"\\??\\MyFirstDevice"
 
+#define IOCTL_MUL CTL_CODE(FILE_DEVICE_UNKNOWN,0x9000,METHOD_BUFFERED, FILE_ANY_ACCESS)
+
+
 VOID notifyCreateProcess(HANDLE ParentId, HANDLE ProcessId,BOOLEAN Create) 
 {
     if (Create)
@@ -88,8 +91,6 @@ NTSTATUS FDOWrite(PDEVICE_OBJECT pDeviceObject, PIRP pIrp)
     ULONG writeSize = pStack->Parameters.Write.Length;
     PCHAR writeBuffer = pIrp->AssociatedIrp.SystemBuffer;// 地址重映射
 
-
-
     RtlZeroMemory(pDeviceObject->DeviceExtension, 200);
     RtlCopyMemory(pDeviceObject->DeviceExtension, writeBuffer, writeSize);
     OTTODBG("DeviceObject->DeviceExtension :%p", pDeviceObject->DeviceExtension);
@@ -97,6 +98,37 @@ NTSTATUS FDOWrite(PDEVICE_OBJECT pDeviceObject, PIRP pIrp)
     pIrp->IoStatus.Information = strlen(writeBuffer);
     OTTODBG("R0 Writer buffer pointer is %p,msg:%s\n", writeBuffer, writeBuffer);
     OTTODBG("Want to write size :%d,Really Info len is:%lld\n", writeSize, strlen(writeBuffer));
+
+    IoCompleteRequest(pIrp, IO_NO_INCREMENT);
+    return STATUS_SUCCESS;
+}
+/* 自定义虚拟设备控制 */
+NTSTATUS FDOControl(PDEVICE_OBJECT pDeviceObject, PIRP pIrp)
+{
+    OTTODBG("[%s %s] is called\n", __FILE__, __FUNCTION__);
+    UNREFERENCED_PARAMETER(pDeviceObject);
+    NTSTATUS status = STATUS_SUCCESS;
+    PIO_STACK_LOCATION pStack = IoGetCurrentIrpStackLocation(pIrp);
+
+    UCHAR IOCode = pStack->MinorFunction;
+    ULONG inLen = pStack->Parameters.DeviceIoControl.InputBufferLength;
+    ULONG outLen = pStack->Parameters.DeviceIoControl.OutputBufferLength;
+    ULONG ioInfo = 0;
+    switch (IOCode)
+    {
+    case IOCTL_MUL:
+    {
+        DWORD32 inData = *(PDWORD32)pIrp->AssociatedIrp.SystemBuffer;
+        inData *= 5;
+        *(PDWORD32)pIrp->AssociatedIrp.SystemBuffer = inData;
+        ioInfo = sizeof(DWORD32);
+        break;
+    }
+    default:
+        status = STATUS_UNSUCCESSFUL;
+        ioInfo = 0;
+        break;
+    }
 
     IoCompleteRequest(pIrp, IO_NO_INCREMENT);
     return STATUS_SUCCESS;
@@ -139,6 +171,7 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT     DriverObject,PUNICODE_STRING    Registry
     DriverObject->MajorFunction[IRP_MJ_CLEANUP] = FDOCleanUp;
     DriverObject->MajorFunction[IRP_MJ_READ] = FDORead;
     DriverObject->MajorFunction[IRP_MJ_WRITE] = FDOWrite;
+    DriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL] = FDOControl;
 
     
     return status;

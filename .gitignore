@@ -30,3 +30,14 @@
 *.exe
 *.out
 *.app
+
+# others
+.vs/
+*.vcxproj*
+*.log
+*.tlog/
+*.pdb
+*.recipe
+
+
+

@@ -19,19 +19,9 @@ NTSTATUS kernelCopyFile(PWCHAR inDestFile, PWCHAR inSrcFile) {
 		OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE, NULL, NULL);
 	InitializeObjectAttributes(&objSrc, &srcFile,
 		OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE, NULL, NULL);
-	OTTODBG("destFile:%wZ\n", destFile);
-	OTTODBG("srcFile:%wZ\n", srcFile);
-	status = IoCreateFileEx(&hFileSrc,
-		GENERIC_ALL,
-		&objSrc,
-		&ioStackSrc,
-		NULL,
-		FILE_ATTRIBUTE_NORMAL,
-		FILE_SHARE_VALID_FLAGS,
-		FILE_OPEN,
-		FILE_SYNCHRONOUS_IO_NONALERT,
-		NULL,
-		0,0,0, IO_IGNORE_SHARE_ACCESS_CHECK,0);
+	OTTODBG("destFile:%wZ", destFile);
+	// 读源文件 GENERIC_ALL可能会导致 STATUS_SHARING_VIOLATION
+	status = ZwOpenFile(&hFileSrc, GENERIC_READ, &objSrc, &ioStackSrc, FILE_SHARE_READ | FILE_SHARE_WRITE, FILE_SYNCHRONOUS_IO_NONALERT);
 	if (!NT_SUCCESS(status)) {
 		OTTODBG("Open Source File Failed:%x\n", status);
 		return status;
@@ -85,12 +75,11 @@ NTSTATUS kernelCopyFile(PWCHAR inDestFile, PWCHAR inSrcFile) {
 		return status;
 	}
 	OTTODBG("Really Write:%lld\n", ioStackDest.Information);
-
-	//修改注册表的驱动的路径和启动值
 	ExFreePool(pFileBuffer);
 	ZwClose(hFileDest);
 	return STATUS_SUCCESS;
 }
+
 NTSTATUS DriverEntry(PDRIVER_OBJECT pDriver, PUNICODE_STRING pPath) {
 	NTSTATUS status = STATUS_SUCCESS;
 	OTTODBG("-- Deriver Path:%wZ ---- \n",pPath);

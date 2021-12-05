@@ -38,7 +38,7 @@ NTSTATUS kernelCopyFile(PWCHAR inDestFile, PWCHAR inSrcFile) {
 		OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE, NULL, NULL);
 	OTTODBG("destFile:%wZ", destFile);
 	// 读源文件
-	status = ZwOpenFile(&hFileSrc, GENERIC_ALL, &objSrc, &ioStackSrc, FILE_SHARE_READ | FILE_SHARE_WRITE, FILE_SYNCHRONOUS_IO_NONALERT);
+	status = ZwOpenFile(&hFileSrc, GENERIC_READ, &objSrc, &ioStackSrc, FILE_SHARE_READ | FILE_SHARE_WRITE, FILE_SYNCHRONOUS_IO_NONALERT);
 	if (!NT_SUCCESS(status)) {
 		OTTODBG("Open Source File Failed:%x\n",status);
 		return status;
@@ -74,7 +74,7 @@ NTSTATUS kernelCopyFile(PWCHAR inDestFile, PWCHAR inSrcFile) {
 	OTTODBG("--- IoInfo:%lld --- \n", ioStackSrc.Information);
 	ZwClose(hFileSrc);
 	// 写新文件
-	status = ZwCreateFile(&hFileDest, GENERIC_ALL, &objDest, &ioStackDest, NULL, FILE_ATTRIBUTE_NORMAL,
+	status = ZwCreateFile(&hFileDest, GENERIC_WRITE, &objDest, &ioStackDest, NULL, FILE_ATTRIBUTE_NORMAL,
 		FILE_SHARE_WRITE, FILE_SUPERSEDE, FILE_SYNCHRONOUS_IO_NONALERT, NULL,0);
 	if (!NT_SUCCESS(status)) {
 		OTTODBG("Create File Failed:%x", status);

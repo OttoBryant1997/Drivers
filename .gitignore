@@ -31,6 +31,19 @@
 *.out
 *.app
 
+<<<<<<< HEAD
 .vs/
 *.tlog
 *.log
+=======
+# others
+.vs/
+*.vcxproj*
+*.log
+*.tlog/
+*.pdb
+*.recipe
+
+
+
+>>>>>>> origin/main

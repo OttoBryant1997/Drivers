@@ -2,7 +2,7 @@
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <SignMode>TestSign</SignMode>
-    <DbgengKernelMachineName>win10x64</DbgengKernelMachineName>
+    <DbgengKernelMachineName>win10x64Virtual</DbgengKernelMachineName>
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
     <RemoveDriver>True</RemoveDriver>
     <InstallMode>HardwareId</InstallMode>

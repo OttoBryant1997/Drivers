@@ -1,6 +1,9 @@
 #include <Windows.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <winioctl.h>
+
+#define IOCTL_MUL CTL_CODE(FILE_DEVICE_UNKNOWN,0x9000,METHOD_BUFFERED, FILE_ANY_ACCESS)
 
 int main(int argc, char** argv, char** env) 
 {
@@ -31,6 +34,14 @@ int main(int argc, char** argv, char** env)
 	BOOL bWrite = WriteFile(hDev,msg,strlen(msg),&writeSize,0);
 	system("pause");
 
+	// to do selfdefined io control
+	printf("to do IoControl\n");
+	DWORD32 inValue = 0, outValue = 0;
+	DWORD returnSize = 0;
+	DeviceIoControl(hDev, IOCTL_MUL, &inValue, sizeof(DWORD32),
+		&outValue, sizeof(DWORD32),&returnSize,0);
+	printf("after finish IoControl,outValue is :%d\n",outValue);
+	system("pause");
 	CloseHandle(hDev);
 	system("pause");
 	return 0;

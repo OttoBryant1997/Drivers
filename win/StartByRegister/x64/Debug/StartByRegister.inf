@@ -1,0 +1,90 @@
+;
+; StartByRegister.inf
+;
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=Sample ; TODO: edit Class
+ClassGuid={78A1C341-4539-11d3-B88D-00C04FAD5171} ; TODO: edit ClassGuid
+Provider=%ManufacturerName%
+CatalogFile=StartByRegister.cat
+DriverVer = 12/06/2021,2.59.40.346
+PnpLockDown=1
+
+[DestinationDirs]
+DefaultDestDir = 12
+StartByRegister_Device_CoInstaller_CopyFiles = 11
+
+; ================= Class section =====================
+
+[ClassInstall32]
+Addreg=SampleClassReg
+
+[SampleClassReg]
+HKR,,,0,%ClassName%
+HKR,,Icon,,-5
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+StartByRegister.sys  = 1,,
+;
+
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%ManufacturerName%=Standard,NTamd64
+
+[Standard.NTamd64]
+%StartByRegister.DeviceDesc%=StartByRegister_Device, Root\StartByRegister ; TODO: edit hw-id
+
+[StartByRegister_Device.NT]
+CopyFiles=Drivers_Dir
+
+[Drivers_Dir]
+StartByRegister.sys
+
+;-------------- Service installation
+[StartByRegister_Device.NT.Services]
+AddService = StartByRegister,%SPSVCINST_ASSOCSERVICE%, StartByRegister_Service_Inst
+
+; -------------- StartByRegister driver install sections
+[StartByRegister_Service_Inst]
+DisplayName    = %StartByRegister.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\StartByRegister.sys
+
+;
+;--- StartByRegister_Device Coinstaller installation ------
+;
+
+[StartByRegister_Device.NT.CoInstallers]
+AddReg=StartByRegister_Device_CoInstaller_AddReg
+CopyFiles=StartByRegister_Device_CoInstaller_CopyFiles
+
+[StartByRegister_Device_CoInstaller_AddReg]
+;
+
+
+[StartByRegister_Device_CoInstaller_CopyFiles]
+;
+
+
+[StartByRegister_Device.NT.Wdf]
+KmdfService =  StartByRegister, StartByRegister_wdfsect
+[StartByRegister_wdfsect]
+KmdfLibraryVersion = 1.15
+
+[Strings]
+SPSVCINST_ASSOCSERVICE= 0x00000002
+ManufacturerName="<Your manufacturer name>" ;TODO: Replace with your manufacturer name
+ClassName="Samples" ; TODO: edit ClassName
+DiskName = "StartByRegister Installation Disk"
+StartByRegister.DeviceDesc = "StartByRegister Device"
+StartByRegister.SVCDESC = "StartByRegister Service"

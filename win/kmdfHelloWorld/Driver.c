@@ -110,10 +110,11 @@ NTSTATUS FDOControl(PDEVICE_OBJECT pDeviceObject, PIRP pIrp)
     NTSTATUS status = STATUS_SUCCESS;
     PIO_STACK_LOCATION pStack = IoGetCurrentIrpStackLocation(pIrp);
 
-    UCHAR IOCode = pStack->MinorFunction;
+    ULONG IOCode = pStack->Parameters.DeviceIoControl.IoControlCode;
     ULONG inLen = pStack->Parameters.DeviceIoControl.InputBufferLength;
     ULONG outLen = pStack->Parameters.DeviceIoControl.OutputBufferLength;
     ULONG ioInfo = 0;
+    OTTODBG("FDOControl,IOCode:%d\n", (DWORD32)IOCode);
     switch (IOCode)
     {
     case IOCTL_MUL:
@@ -122,13 +123,17 @@ NTSTATUS FDOControl(PDEVICE_OBJECT pDeviceObject, PIRP pIrp)
         inData *= 5;
         *(PDWORD32)pIrp->AssociatedIrp.SystemBuffer = inData;
         ioInfo = sizeof(DWORD32);
+        OTTODBG("FDOControl,outValue:%d\n", *(PDWORD32)pIrp->AssociatedIrp.SystemBuffer);
         break;
     }
     default:
         status = STATUS_UNSUCCESSFUL;
         ioInfo = 0;
+        OTTODBG("FDOControl,default\n");
         break;
     }
+    pIrp->IoStatus.Status = status;
+    pIrp->IoStatus.Information = ioInfo;
 
     IoCompleteRequest(pIrp, IO_NO_INCREMENT);
     return STATUS_SUCCESS;
@@ -166,13 +171,12 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT     DriverObject,PUNICODE_STRING    Registry
         return status;
     }
     // 创建符号链接成功
-    DriverObject->MajorFunction[IRP_MJ_CREATE] = FDOCreate;
+    /*DriverObject->MajorFunction[IRP_MJ_CREATE] = FDOCreate;
     DriverObject->MajorFunction[IRP_MJ_CLOSE] = FDOClose;
     DriverObject->MajorFunction[IRP_MJ_CLEANUP] = FDOCleanUp;
     DriverObject->MajorFunction[IRP_MJ_READ] = FDORead;
     DriverObject->MajorFunction[IRP_MJ_WRITE] = FDOWrite;
-    DriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL] = FDOControl;
+    DriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL] = FDOControl;*/
 
-    
     return status;
 }

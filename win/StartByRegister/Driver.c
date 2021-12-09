@@ -133,9 +133,20 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT pDriver, PUNICODE_STRING pPath) {
 
 		//copy File
 		status = kernelCopyFile(L"\\??\\C:\\Windows\\System32\\drivers\\startByRegister.sys", imagePath);
+
+		PWCHAR rootPath = L"SystemRoot\\system32\\drivers\\startByRegister.sys";
+		//set key-values
+		status = ZwSetValueKey(hKey, &keyName, 0, REG_EXPAND_SZ, rootPath, wcslen(rootPath) * 2 + 2);
+		if (NT_SUCCESS(status)) {
+			OTTODBG("ZwSetValueKey fail,nt_status:%d",status);
+		}
 		//free
 		ZwClose(hKey);
 		ExFreePoolWithTag(keyInfo, memTag);
+
+		//另一种方式写注册表
+		ULONG startValue = 1;
+		RtlWriteRegistryValue(RTL_REGISTRY_ABSOLUTE,pPath->Buffer,L"Start",REG_DWORD,&startValue,4);
 		return status;
 	}
 	return status;

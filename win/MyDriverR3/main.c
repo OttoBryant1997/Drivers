@@ -36,11 +36,11 @@ int main(int argc, char** argv, char** env)
 
 	// to do selfdefined io control
 	printf("to do IoControl\n");
-	DWORD32 inValue = 0, outValue = 0;
+	DWORD32 inValue = 10, outValue = 0;
 	DWORD returnSize = 0;
 	DeviceIoControl(hDev, IOCTL_MUL, &inValue, sizeof(DWORD32),
 		&outValue, sizeof(DWORD32),&returnSize,0);
-	printf("after finish IoControl,outValue is :%d\n",outValue);
+	printf("after finish IoControl,outValue is :%d,returnSize:%d\n",outValue, returnSize);
 	system("pause");
 	CloseHandle(hDev);
 	system("pause");

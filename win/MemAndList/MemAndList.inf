@@ -1,0 +1,87 @@
+;
+; MemAndList.inf
+;
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=Sample ; TODO: edit Class
+ClassGuid={78A1C341-4539-11d3-B88D-00C04FAD5171} ; TODO: edit ClassGuid
+Provider=%ManufacturerName%
+CatalogFile=MemAndList.cat
+DriverVer= ; TODO: set DriverVer in stampinf property pages
+PnpLockDown=1
+
+[DestinationDirs]
+DefaultDestDir = 12
+MemAndList_Device_CoInstaller_CopyFiles = 11
+
+; ================= Class section =====================
+
+[ClassInstall32]
+Addreg=SampleClassReg
+
+[SampleClassReg]
+HKR,,,0,%ClassName%
+HKR,,Icon,,-5
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+MemAndList.sys  = 1,,
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll=1 ; make sure the number matches with SourceDisksNames
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%ManufacturerName%=Standard,NT$ARCH$
+
+[Standard.NT$ARCH$]
+%MemAndList.DeviceDesc%=MemAndList_Device, Root\MemAndList ; TODO: edit hw-id
+
+[MemAndList_Device.NT]
+CopyFiles=Drivers_Dir
+
+[Drivers_Dir]
+MemAndList.sys
+
+;-------------- Service installation
+[MemAndList_Device.NT.Services]
+AddService = MemAndList,%SPSVCINST_ASSOCSERVICE%, MemAndList_Service_Inst
+
+; -------------- MemAndList driver install sections
+[MemAndList_Service_Inst]
+DisplayName    = %MemAndList.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\MemAndList.sys
+
+;
+;--- MemAndList_Device Coinstaller installation ------
+;
+
+[MemAndList_Device.NT.CoInstallers]
+AddReg=MemAndList_Device_CoInstaller_AddReg
+CopyFiles=MemAndList_Device_CoInstaller_CopyFiles
+
+[MemAndList_Device_CoInstaller_AddReg]
+HKR,,CoInstallers32,0x00010000, "WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll,WdfCoInstaller"
+
+[MemAndList_Device_CoInstaller_CopyFiles]
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll
+
+[MemAndList_Device.NT.Wdf]
+KmdfService =  MemAndList, MemAndList_wdfsect
+[MemAndList_wdfsect]
+KmdfLibraryVersion = $KMDFVERSION$
+
+[Strings]
+SPSVCINST_ASSOCSERVICE= 0x00000002
+ManufacturerName="<Your manufacturer name>" ;TODO: Replace with your manufacturer name
+ClassName="Samples" ; TODO: edit ClassName
+DiskName = "MemAndList Installation Disk"
+MemAndList.DeviceDesc = "MemAndList Device"
+MemAndList.SVCDESC = "MemAndList Service"

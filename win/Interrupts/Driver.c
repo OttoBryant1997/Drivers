@@ -17,9 +17,22 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT pDriverObj, PUNICODE_STRING pPath)
 	OTTODBG("after raise to dpc, Irql is %d", level);
 
 
-	//KeLowerIrql(oldIrql);
+	KeLowerIrql(oldIrql);
 	level = KeGetCurrentIrql();
 	OTTODBG("after low to oldIrql, Irql is %d", level);
+
+
+	//зда§Ыј 
+	KSPIN_LOCK kspinLock;
+	KeInitializeSpinLock(&kspinLock);
+
+
+
+	KeAcquireSpinLock(&kspinLock, &level);
+	KIRQL spinlockIrql = KeGetCurrentIrql();
+	OTTODBG("after KeAcquireSpinLock to dpc, Irql is %d", spinlockIrql);
+	// to operate some global and Api in level dpc
+	KeReleaseSpinLock(&kspinLock, level);
 	return status;
 }
 

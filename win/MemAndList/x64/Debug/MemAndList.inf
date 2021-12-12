@@ -1,5 +1,5 @@
 ;
-; Interrupts.inf
+; MemAndList.inf
 ;
 
 [Version]
@@ -7,13 +7,13 @@ Signature="$WINDOWS NT$"
 Class=Sample ; TODO: edit Class
 ClassGuid={78A1C341-4539-11d3-B88D-00C04FAD5171} ; TODO: edit ClassGuid
 Provider=%ManufacturerName%
-CatalogFile=Interrupts.cat
-DriverVer = 12/10/2021,20.22.39.620
+CatalogFile=MemAndList.cat
+DriverVer = 12/13/2021,0.12.53.705
 PnpLockDown=1
 
 [DestinationDirs]
 DefaultDestDir = 12
-Interrupts_Device_CoInstaller_CopyFiles = 11
+MemAndList_Device_CoInstaller_CopyFiles = 11
 
 ; ================= Class section =====================
 
@@ -28,7 +28,7 @@ HKR,,Icon,,-5
 1 = %DiskName%,,,""
 
 [SourceDisksFiles]
-Interrupts.sys  = 1,,
+MemAndList.sys  = 1,,
 ;
 
 
@@ -40,51 +40,51 @@ Interrupts.sys  = 1,,
 %ManufacturerName%=Standard,NTamd64
 
 [Standard.NTamd64]
-%Interrupts.DeviceDesc%=Interrupts_Device, Root\Interrupts ; TODO: edit hw-id
+%MemAndList.DeviceDesc%=MemAndList_Device, Root\MemAndList ; TODO: edit hw-id
 
-[Interrupts_Device.NT]
+[MemAndList_Device.NT]
 CopyFiles=Drivers_Dir
 
 [Drivers_Dir]
-Interrupts.sys
+MemAndList.sys
 
 ;-------------- Service installation
-[Interrupts_Device.NT.Services]
-AddService = Interrupts,%SPSVCINST_ASSOCSERVICE%, Interrupts_Service_Inst
+[MemAndList_Device.NT.Services]
+AddService = MemAndList,%SPSVCINST_ASSOCSERVICE%, MemAndList_Service_Inst
 
-; -------------- Interrupts driver install sections
-[Interrupts_Service_Inst]
-DisplayName    = %Interrupts.SVCDESC%
+; -------------- MemAndList driver install sections
+[MemAndList_Service_Inst]
+DisplayName    = %MemAndList.SVCDESC%
 ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
 StartType      = 3               ; SERVICE_DEMAND_START
 ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
-ServiceBinary  = %12%\Interrupts.sys
+ServiceBinary  = %12%\MemAndList.sys
 
 ;
-;--- Interrupts_Device Coinstaller installation ------
+;--- MemAndList_Device Coinstaller installation ------
 ;
 
-[Interrupts_Device.NT.CoInstallers]
-AddReg=Interrupts_Device_CoInstaller_AddReg
-CopyFiles=Interrupts_Device_CoInstaller_CopyFiles
+[MemAndList_Device.NT.CoInstallers]
+AddReg=MemAndList_Device_CoInstaller_AddReg
+CopyFiles=MemAndList_Device_CoInstaller_CopyFiles
 
-[Interrupts_Device_CoInstaller_AddReg]
-;
-
-
-[Interrupts_Device_CoInstaller_CopyFiles]
+[MemAndList_Device_CoInstaller_AddReg]
 ;
 
 
-[Interrupts_Device.NT.Wdf]
-KmdfService =  Interrupts, Interrupts_wdfsect
-[Interrupts_wdfsect]
+[MemAndList_Device_CoInstaller_CopyFiles]
+;
+
+
+[MemAndList_Device.NT.Wdf]
+KmdfService =  MemAndList, MemAndList_wdfsect
+[MemAndList_wdfsect]
 KmdfLibraryVersion = 1.15
 
 [Strings]
 SPSVCINST_ASSOCSERVICE= 0x00000002
 ManufacturerName="<Your manufacturer name>" ;TODO: Replace with your manufacturer name
 ClassName="Samples" ; TODO: edit ClassName
-DiskName = "Interrupts Installation Disk"
-Interrupts.DeviceDesc = "Interrupts Device"
-Interrupts.SVCDESC = "Interrupts Service"
+DiskName = "MemAndList Installation Disk"
+MemAndList.DeviceDesc = "MemAndList Device"
+MemAndList.SVCDESC = "MemAndList Service"

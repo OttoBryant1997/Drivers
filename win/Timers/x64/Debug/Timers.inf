@@ -1,0 +1,90 @@
+;
+; Timers.inf
+;
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=Sample ; TODO: edit Class
+ClassGuid={78A1C341-4539-11d3-B88D-00C04FAD5171} ; TODO: edit ClassGuid
+Provider=%ManufacturerName%
+CatalogFile=Timers.cat
+DriverVer = 12/28/2021,0.13.58.506
+PnpLockDown=1
+
+[DestinationDirs]
+DefaultDestDir = 12
+Timers_Device_CoInstaller_CopyFiles = 11
+
+; ================= Class section =====================
+
+[ClassInstall32]
+Addreg=SampleClassReg
+
+[SampleClassReg]
+HKR,,,0,%ClassName%
+HKR,,Icon,,-5
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+Timers.sys  = 1,,
+;
+
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%ManufacturerName%=Standard,NTamd64
+
+[Standard.NTamd64]
+%Timers.DeviceDesc%=Timers_Device, Root\Timers ; TODO: edit hw-id
+
+[Timers_Device.NT]
+CopyFiles=Drivers_Dir
+
+[Drivers_Dir]
+Timers.sys
+
+;-------------- Service installation
+[Timers_Device.NT.Services]
+AddService = Timers,%SPSVCINST_ASSOCSERVICE%, Timers_Service_Inst
+
+; -------------- Timers driver install sections
+[Timers_Service_Inst]
+DisplayName    = %Timers.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\Timers.sys
+
+;
+;--- Timers_Device Coinstaller installation ------
+;
+
+[Timers_Device.NT.CoInstallers]
+AddReg=Timers_Device_CoInstaller_AddReg
+CopyFiles=Timers_Device_CoInstaller_CopyFiles
+
+[Timers_Device_CoInstaller_AddReg]
+;
+
+
+[Timers_Device_CoInstaller_CopyFiles]
+;
+
+
+[Timers_Device.NT.Wdf]
+KmdfService =  Timers, Timers_wdfsect
+[Timers_wdfsect]
+KmdfLibraryVersion = 1.15
+
+[Strings]
+SPSVCINST_ASSOCSERVICE= 0x00000002
+ManufacturerName="<Your manufacturer name>" ;TODO: Replace with your manufacturer name
+ClassName="Samples" ; TODO: edit ClassName
+DiskName = "Timers Installation Disk"
+Timers.DeviceDesc = "Timers Device"
+Timers.SVCDESC = "Timers Service"

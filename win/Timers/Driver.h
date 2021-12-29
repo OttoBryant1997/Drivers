@@ -28,3 +28,5 @@ KDPC gDpcObj = { 0 };
 
 WORK_QUEUE_ITEM gWorkItem = { 0 };
 VOID workItemRoutine(PDEVICE_OBJECT,PVOID);
+
+extern NTSYSAPI PUCHAR NTAPI PsGetProcessImageFileName(PEPROCESS);

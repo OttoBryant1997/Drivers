@@ -1,5 +1,5 @@
 ;
-; Timers.inf
+; Notifies.inf
 ;
 
 [Version]
@@ -7,13 +7,13 @@ Signature="$WINDOWS NT$"
 Class=Sample ; TODO: edit Class
 ClassGuid={78A1C341-4539-11d3-B88D-00C04FAD5171} ; TODO: edit ClassGuid
 Provider=%ManufacturerName%
-CatalogFile=Timers.cat
-DriverVer = 12/29/2021,21.28.6.82
+CatalogFile=Notifies.cat
+DriverVer = 12/29/2021,23.33.46.149
 PnpLockDown=1
 
 [DestinationDirs]
 DefaultDestDir = 12
-Timers_Device_CoInstaller_CopyFiles = 11
+Notifies_Device_CoInstaller_CopyFiles = 11
 
 ; ================= Class section =====================
 
@@ -28,7 +28,7 @@ HKR,,Icon,,-5
 1 = %DiskName%,,,""
 
 [SourceDisksFiles]
-Timers.sys  = 1,,
+Notifies.sys  = 1,,
 ;
 
 
@@ -40,51 +40,51 @@ Timers.sys  = 1,,
 %ManufacturerName%=Standard,NTamd64
 
 [Standard.NTamd64]
-%Timers.DeviceDesc%=Timers_Device, Root\Timers ; TODO: edit hw-id
+%Notifies.DeviceDesc%=Notifies_Device, Root\Notifies ; TODO: edit hw-id
 
-[Timers_Device.NT]
+[Notifies_Device.NT]
 CopyFiles=Drivers_Dir
 
 [Drivers_Dir]
-Timers.sys
+Notifies.sys
 
 ;-------------- Service installation
-[Timers_Device.NT.Services]
-AddService = Timers,%SPSVCINST_ASSOCSERVICE%, Timers_Service_Inst
+[Notifies_Device.NT.Services]
+AddService = Notifies,%SPSVCINST_ASSOCSERVICE%, Notifies_Service_Inst
 
-; -------------- Timers driver install sections
-[Timers_Service_Inst]
-DisplayName    = %Timers.SVCDESC%
+; -------------- Notifies driver install sections
+[Notifies_Service_Inst]
+DisplayName    = %Notifies.SVCDESC%
 ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
 StartType      = 3               ; SERVICE_DEMAND_START
 ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
-ServiceBinary  = %12%\Timers.sys
+ServiceBinary  = %12%\Notifies.sys
 
 ;
-;--- Timers_Device Coinstaller installation ------
+;--- Notifies_Device Coinstaller installation ------
 ;
 
-[Timers_Device.NT.CoInstallers]
-AddReg=Timers_Device_CoInstaller_AddReg
-CopyFiles=Timers_Device_CoInstaller_CopyFiles
+[Notifies_Device.NT.CoInstallers]
+AddReg=Notifies_Device_CoInstaller_AddReg
+CopyFiles=Notifies_Device_CoInstaller_CopyFiles
 
-[Timers_Device_CoInstaller_AddReg]
-;
-
-
-[Timers_Device_CoInstaller_CopyFiles]
+[Notifies_Device_CoInstaller_AddReg]
 ;
 
 
-[Timers_Device.NT.Wdf]
-KmdfService =  Timers, Timers_wdfsect
-[Timers_wdfsect]
+[Notifies_Device_CoInstaller_CopyFiles]
+;
+
+
+[Notifies_Device.NT.Wdf]
+KmdfService =  Notifies, Notifies_wdfsect
+[Notifies_wdfsect]
 KmdfLibraryVersion = 1.15
 
 [Strings]
 SPSVCINST_ASSOCSERVICE= 0x00000002
 ManufacturerName="<Your manufacturer name>" ;TODO: Replace with your manufacturer name
 ClassName="Samples" ; TODO: edit ClassName
-DiskName = "Timers Installation Disk"
-Timers.DeviceDesc = "Timers Device"
-Timers.SVCDESC = "Timers Service"
+DiskName = "Notifies Installation Disk"
+Notifies.DeviceDesc = "Notifies Device"
+Notifies.SVCDESC = "Notifies Service"

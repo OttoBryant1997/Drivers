@@ -8,7 +8,7 @@ Class=Sample ; TODO: edit Class
 ClassGuid={78A1C341-4539-11d3-B88D-00C04FAD5171} ; TODO: edit ClassGuid
 Provider=%ManufacturerName%
 CatalogFile=Timers.cat
-DriverVer = 12/28/2021,0.13.58.506
+DriverVer = 12/29/2021,21.28.6.82
 PnpLockDown=1
 
 [DestinationDirs]

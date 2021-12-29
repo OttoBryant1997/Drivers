@@ -33,47 +33,7 @@ ULONG   GetProcessNameOffset(void)
 }
 
 
-//#pragma LOCKEDCODE
-//void PrintProcessName(HANDLE dwPid)
-//{
-//    HANDLE ProcessHandle;
-//    NTSTATUS status;
-//    OBJECT_ATTRIBUTES  ObjectAttributes;
-//    CLIENT_ID myCid;
-//    PEPROCESS EProcess;
-//    int a = GetProcessNameOffset();
-//    InitializeObjectAttributes(&ObjectAttributes, 0, 0, 0, 0);
-//
-//    myCid.UniqueProcess = dwPid;
-//    myCid.UniqueThread = 0;
-//
-//    //打开进程，获取句柄
-//    status = ZwOpenProcess(&ProcessHandle, PROCESS_ALL_ACCESS, &ObjectAttributes, &myCid);
-//    if (!NT_SUCCESS(status))
-//    {
-//        DbgPrint("error/n");
-//        return;
-//    }
-//
-//    //得到EPROCESS，结构中取进程名
-//    status = ObReferenceObjectByHandle(ProcessHandle, FILE_READ_DATA, 0, KernelMode, &EProcess, 0);
-//    if (status == STATUS_SUCCESS)
-//    {
-//        char* ProcessName = (char*)EProcess + a;
-//        char* PsName = PsGetProcessImageFileName(EProcess);
-//
-//        DbgPrint("ProcessName is %s", ProcessName);
-//        DbgPrint("PsName is %s/n", PsName);
-//        ObDereferenceObject(EProcess);
-//        ZwClose(ProcessHandle);
-//    }
-//    else
-//    {
-//        DbgPrint("Get ProcessName error");
-//        ObDereferenceObject(EProcess);
-//        ZwClose(ProcessHandle);
-//    }
-//}
+
 
 NTSTATUS DriverEntry(PDRIVER_OBJECT     DriverObject, PUNICODE_STRING    RegistryPath)
 {
@@ -130,14 +90,15 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT     DriverObject, PUNICODE_STRING    Registr
     // 相对于DPC的级别限制 很多函数不能调用 可以使用WorkItem来做passive_level的任务
     PIO_WORKITEM pWorkItem  = IoAllocateWorkItem(pDevice);
     IoQueueWorkItem(pWorkItem, workItemRoutine, CriticalWorkQueue, NULL);
+    
     return status;
 }
 
 #pragma LOCKEDCODE
 VOID IoTimeoutRountine(PDEVICE_OBJECT DeviceObject, PVOID Context)
 {
-    OTTODBG("TimeoutRountine  irql:%d\n", KeGetCurrentIrql());
-    //PrintProcessName(PsGetCurrentProcessId());
+    OTTODBG("TimeoutRountine  irql:%d,CurProcess:%s\n", KeGetCurrentIrql(), 
+        PsGetProcessImageFileName(PsGetCurrentProcess()));
 }
 
 VOID DpcRoutine(PKDPC Dpc, PVOID DeferredContext, PVOID SystemArgument1, PVOID SystemArgument2) {

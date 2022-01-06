@@ -9,17 +9,18 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT pCurDrvObj, PUNICODE_STRING pReg) {
 	NTSTATUS status = STATUS_SUCCESS;
 	pCurDrvObj->DriverUnload = DriverUnload;
 	pCurDrvObj->DriverInit = DriverInit;
-    //status = PsSetCreateProcessNotifyRoutine(PsCreatNotify,FALSE);
+    status = PsSetCreateProcessNotifyRoutine(PsCreateNotify,FALSE);
+    OTTODBG("regist processNotify:%p", PsCreateNotify);
     //status = PsSetLoadImageNotifyRoutine(LoadImageNotify);
-    PsSetCreateThreadNotifyRoutine(CreateThreadNotify);
+    //PsSetCreateThreadNotifyRoutine(CreateThreadNotify);
     
 	return status;
 }
 VOID DriverUnload(PDRIVER_OBJECT pDrvObj) {
 	OTTODBG("Driver Unload\n");
-	//PsSetCreateProcessNotifyRoutine(PsCreatNotify, TRUE);
+	PsSetCreateProcessNotifyRoutine(PsCreateNotify, TRUE);
  //   PsRemoveLoadImageNotifyRoutine(LoadImageNotify);
-    PsRemoveCreateThreadNotifyRoutine(CreateThreadNotify);
+    //PsRemoveCreateThreadNotifyRoutine(CreateThreadNotify);
 }
 
 NTSTATUS DriverInit(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath) {
@@ -28,7 +29,7 @@ NTSTATUS DriverInit(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath) {
 	return status;
 }
 
-VOID PsCreatNotify(HANDLE ParentId, HANDLE ProcessId, BOOLEAN Create) {
+VOID PsCreateNotify(HANDLE ParentId, HANDLE ProcessId, BOOLEAN Create) {
     PEPROCESS ParentEprocess = NULL;
     PEPROCESS ChildEprocess = NULL;
     NTSTATUS status;

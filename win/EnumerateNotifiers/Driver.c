@@ -1,6 +1,6 @@
 #include "Driver.h"
 
-NTSTATUS DriverEntry(PDRIVER_OBJECT pCurDrv,PUNICODE_STRING pReg) {
+NTSTATUS DriverEntry(PDRIVER_OBJECT pCurDrv, PUNICODE_STRING pReg) {
 	NTSTATUS status = STATUS_SUCCESS;
 	pCurDrv->DriverUnload = DrvUnload;
 	FindProcessNotify();
@@ -12,7 +12,7 @@ VOID FindProcessNotify() {
 	UNICODE_STRING apiName = { 0 };
 	PUCHAR apiAddr = NULL;
 	LONG offset = 0;
-	PUCHAR PspSetCreateProcessNotifyRoutine = NULL;
+	PUCHAR pNotifiersRoutine = NULL;
 
 	RtlInitUnicodeString(&apiName, L"PsSetCreateProcessNotifyRoutine");
 	apiAddr = MmGetSystemRoutineAddress(&apiName);
@@ -33,17 +33,21 @@ VOID FindProcessNotify() {
 		if (*(apiAddr + i) == 0xe8) // call    nt!PspSetCreateProcessNotifyRoutine
 		{
 			apiAddr += i;
+			for(int j = 0; j < 15; j++){
+				OTTODBG("byteValue:%x\n", (int)apiAddr[j]);
+				
+			}
 			offset = *(PLONG)(apiAddr + 1);
 			PUCHAR basePos = apiAddr + 5;//当前汇编结束位置为
-			PspSetCreateProcessNotifyRoutine = basePos + offset;
+			apiAddr = basePos + offset;
 			break;
 		}
 	}
-	if (!PspSetCreateProcessNotifyRoutine) {
+	if (!apiAddr) {
 		OTTODBG("PsSetCreateProcessNotifyRoutine NOT FOUND\n");
 		return;
 	}
-	OTTODBG("PspSetCreateProcessNotifyRoutine :%p\n", PspSetCreateProcessNotifyRoutine);
+	OTTODBG("PspSetCreateProcessNotifyRoutine :%p\n", apiAddr);
 	for (INT i = 0; i < 1000; i++) {//在代码段中找匹配的内容
 		if (*(apiAddr + i) == 0x4c
 			&& *(apiAddr + i + 1) == 0x8d
@@ -52,18 +56,19 @@ VOID FindProcessNotify() {
 			apiAddr += i;
 			offset = *(PLONG)(apiAddr + 3);
 			PUCHAR basePos = apiAddr + 7;//当前汇编结束位置为
-			PspSetCreateProcessNotifyRoutine = basePos  + offset;
+			pNotifiersRoutine = basePos  + offset;
+			OTTODBG("Array found\n");
 			break;
 		}
 	}
-	if (!PspSetCreateProcessNotifyRoutine) {
-		OTTODBG("PsSetCreateProcessNotifyRoutine still NOT FOUND\n");
+	if (!pNotifiersRoutine) {
+		OTTODBG("pNotifiersRoutine still NOT FOUND\n");
 		return;
 	}
-	PDWORD64 tempNotifyList = (PDWORD64)PspSetCreateProcessNotifyRoutine;
+	PDWORD64 tempNotifyList = (PDWORD64)pNotifiersRoutine;
 	DWORD64 tempNotify = 0;
 	for (int i = 0; i < 64; i++) {
-		tempNotify = *(tempNotifyList + i);
+		tempNotify = tempNotifyList[i];
 		if (!tempNotify) {
 			OTTODBG("tempNotify no more\n");
 			break;
